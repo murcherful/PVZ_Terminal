@@ -126,7 +126,6 @@ class Zombie:public Charactor{
 		Zombie(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tspeed);
 		~Zombie();
 		void update();
-		void draw();
 		virtual void interactive(Plant* p);
 		virtual void slowDown();
 		virtual void randomUpDonw();

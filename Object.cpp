@@ -140,6 +140,102 @@ int Charactor::getW(){
 	return name.length()/2;
 }
 
+Zombie::Zombie(int tx, int ty, int ttype, int thp, int attack, int tdefense, int tattackSpeed, std::string tname, int color, int speed):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
+	speed = tspeed;
+	speedCopy = tspeed;
+	moveCount = 0;
+	slowDownCount = 0;
+}
+
+void Zombie::update(){
+	Charactor::update();
+	if(moveCount == speed-1){
+		x--;
+		moveCount = 0;
+	}
+	else if(slowDownCount != 0){
+		slowDownCount--;
+	}
+	else if(!Charactor::getIsAttackStart()){
+		moveCount++;
+	}
+}
+
+void Zombie::interactive(Plant* p){
+	if(p->getIsZombieValid() && 
+			((speed < 0 && p->getX()+p->getW()+ATTACK_MAX_DIS >= getX()) || 
+			 (speed > 0 && getX()+getW()+ATTACK_MAX_DIS >= p->getX()))){
+		if(!getIsAttackStart()){
+			startAttack();
+		}
+		else if(getIsAttack()){
+			p->defend(getAttack());
+			stopAttack();
+		}
+	}
+}
+
+void Zombie::slowDown(){
+	slowDownCount = speed*0.75;
+}
+
+void Zombie::randomUpDonw(){
+	if(y-BLOCKW <= SSH){
+		y+=BLOCKW;
+	}
+	else if(y+BLOCKW >= SH){
+		y-=BLOCKW;
+	}
+	else{
+		if(rand()%2){
+			y+=BLOCKW;
+		}
+		else{
+			y-=BLOCKW;
+		}
+	}
+}
+
+NormalZombie::NormalZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_NORMALZOMBIE, NORMALZOMBIE_HP, NORMALZOMBIE_ATTACK, NORMALZOMBIE_DEFENSE, NORMALZOMBIE_ATTACK_SPEED, "NormalZ", BLACK, NORMALZOMBIE_SPEED){
+
+}
+
+NormalZombie::~NormalZombie(){
+
+}
+
+ConeZombie::ConeZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_CONEZOMBIE, CONEZOMBIE_HP, CONEZOMBIE_ATTACK, CONEZOMBIE_DEFENSE, CONEZOMBIE_ATTACK_SPEED, "ConeZ", BLACK, CONEZOMBIE_SPEED){
+
+}
+
+ConeZombie::~ConeZombie(){
+
+}
+
+BucketZombie::BucketZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_BUCKETZOMBIE, BUCKETZOMBIE_HP, BUCKETZOMBIE_ATTACK, BUCKETZOMBIE_DEFENSE, BUCKETZOMBIE_ATTACK_SPEED, "BucketZ", BLACK, BUCKETZOMBIE_SPEED){
+
+}
+
+BucketZombie::~BucketZombie(){
+
+}
+
+NewsZombie::NewsZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_NEWSZOMBIE, NEWSZOMBIE_HP, NEWSZOMBIE_ATTACK, NEWSZOMBIE_DEFENSE, NEWSZOMBIE_ATTACK_SPEED, "NewsZ", BLACK, NEWSZOMBIE_SPEED){
+
+}
+
+NewsZombie::~NewsZombie(){
+
+}
+
+void NewsZombie::update(){
+	Zombie::update();
+	if(hp < 150){
+		speed = speedCopy*0.5;
+	}
+}
+
+
 
 	hp-=SPIKEWEED_HP_DESC;
 			stopAttack();

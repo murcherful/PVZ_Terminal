@@ -235,15 +235,151 @@ void NewsZombie::update(){
 	}
 }
 
-
-
-	hp-=SPIKEWEED_HP_DESC;
-			stopAttack();
-		}
-	}	
+Plant::Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime, int tbulletType, int tisZombieValid):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
+	needSunNumber = tneedSunNumber;
+	coolDownTime = tcoolDownTime;
+	bulletType = tbulletType;
+	isZombieValid = tisZombieValid;
 }
 
-Garlic::Garlic(int tx, int ty):Plant(tx, ty, OBJ_TYPE_GARLIC, GARLIC_HP, GARLIC_ATTACK, GARLIC_DEFENSE, GARLIC_ATTACK_SPEED, "Garlic", LIGHTGRAY, GARLIC_NEED_SUN_NUMBER, GARLIC_COOLDOWN_TIME){
+Plant::~Plant(){
+
+}
+
+bool Plant:: getIsZombieValid(){
+	return isZombieValid;
+}
+
+bool Plant::getHasBullet(){
+	if(bulletType != -1){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+int Plant::getNeedSunNumber(){
+	return needSunNumber;
+}
+
+void Plant::interactive(Zombie* z){
+	if(getHasBullet()){
+		if(getY() == z->getY() && getX() <= z->getX()){
+			if(!getIsAttackStart()){
+				startAttack();
+			}
+		}
+	}
+	else if(attack != 0){
+		if(getX()+getW()+ATTACK_MAX_DIS >= z->getX()){
+			if(!getIsAttackStart){
+				startAttack();
+			}
+			else if(getIsAttack()){
+				z->defend(getAttack());
+				stopAttack();
+			}
+		}
+	}
+}
+
+PlantInfo Plant::getInfo(){
+	return PlantInfo(name, color, type, needSunNumber, coolDownTime);
+}
+
+ObjectSignal Plant::getSignal(){
+	ObjectSignal signal;
+	signal.type = OBJ_SIGNAL_NULL;
+	if(bulletType != -1){
+		signal.type = OBJ_SIGNAL_GEN_BULLET;
+		signal.data = bulletType;
+		signal.x = x;
+		signal.y = y;
+	}
+	return signal;
+}
+
+SunFlower::SunFlower(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SUNFLOWER, SUNFLOWER_HP, SUNFLOWER_ATTACK, SUNFLOWER_DEFENSE, SUNFLOWER_ATTACK_SPEED, "SunFlower", SUNFLOWER_NEED_SUN_NUMBER, SUNFLOWER_COOLDOWN_TIME, -1, 1){
+	genSunCount = 0;
+	genSunCount = SUNFLOWER_GEN_SUN_SPEED;
+}
+
+SunFlower::~SunFlower(){
+
+}
+
+ObjectSignal SunFlower::getSignal(){
+	ObjectSignal signal;
+	signal.type = OBJ_SIGNAL_NULL;
+	if(genSunCount==1){
+		signal.type = OBJ_SIGNAL_GEN_SUN;
+		signal.x = x;
+		signal.y = y;
+	}
+	return signal;
+}
+
+void SunFlower::update(){
+	Charactor::update();
+	genSunCount = (genSunCount+1)%genSunSpeed;
+}
+
+PeaShooter::PeaShooter(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_PEASHOOTER, PEASHOOTER_HP, PEASHOOTER_ATTACK, PEASHOOTER_DEFENSE, PEASHOOTER_ATTACK_SPEED, "PeaShooter", PEASHOOTER_NEED_SUN_NUMBER, PEASHOOTER_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+
+}
+
+PeaShooter::~PeaShooter(){
+
+}
+
+SnowPea::SnowPea(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SNOWPEA, SNOWPEA_HP, SNOWPEA_ATTACK, SNOWPEA_DEFENSE, SNOWPEA_ATTACK_SPEED, "SnowPea", SNOWPEA_NEED_SUN_NUMBER, SNOWPEA_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+
+}
+
+SnowPea::~SnowPea(){
+
+}
+
+MelonPult::MelonPult(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_MELONPULT, MELONPULT_HP, MELONPULT_ATTACK, MELONPULT_DEFENSE, MELONPULT_ATTACK_SPEED, "MelonPult", MELONPULT_NEED_SUN_NUMBER, MELONPULT_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+
+}
+
+MelonPult::~MelonPult(){
+
+}
+
+SnowMelon::SnowMelon(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SNOWMELON, SNOWMELON_HP, SNOWMELON_ATTACK, SNOWMELON_DEFENSE, SNOWMELON_ATTACK_SPEED, "SnowMelon", SNOWMELON_NEED_SUN_NUMBER, SNOWMELON_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+
+}
+
+SnowMelon::~SnowMelon(){
+
+}
+
+SpikeWeed::SpikeWeed(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SPIKEWEED, SPIKEWEED_HP, SPIKEWEED_ATTACK, SPIKEWEED_DEFENSE, SPIKEWEED_ATTACK_SPEED, "SpikeWeed", SPIKEWEED_NEED_SUN_NUMBER, SPIKEWEED_COOLDOWN_TIME, -1, 0){
+
+}
+
+SpikeWeed::~SpikeWeed(){
+
+}
+
+void interactive(Zombie* z){
+	if(getX()+getW()+ATTACK_MAX_DIS >= z->getX() && 
+			z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
+		if(!getIsAttackStart){
+			startAttack();
+		}
+		else if(getIsAttack()){
+			z->defend(getAttack());
+			hp-=SPIKEWEED_HP_DESC;
+			stopAttack();
+		}
+	}
+}
+
+Garlic::Garlic(int tx, int ty):Plant(tx, ty, OBJ_TYPE_GARLIC, GARLIC_HP, GARLIC_ATTACK, GARLIC_DEFENSE, GARLIC_ATTACK_SPEED, "Garlic", LIGHTGRAY, GARLIC_NEED_SUN_NUMBER, GARLIC_COOLDOWN_TIME, -1, 1){
 
 }
 

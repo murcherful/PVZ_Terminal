@@ -198,18 +198,19 @@ typedef struct PlantInfo{
 class Plant:public Charactor{
 	private:
 	public:
-		bool hasBullet;
+		int bulletType;
 		bool isZombieValid;
 		int needSunNumber;
 		int coolDownTime;
 		
-		Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime);
+		Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime, int bulletType, bool tisZombieValid);
 		~Plant();
 		virtual bool getIsZombieValid();
 		virtual bool getHasBullet();
 		virtual int getNeedSunNumber();
 		virtual void interactive(Zombie* z);
 		virtual PlantInfo getInfo();
+		ObjectSignal getSignal();
 };
 
 #define SUNFLOWER_GEN_SUN_SPEED   70
@@ -245,7 +246,6 @@ class PeaShooter:public Plant{
 	public:
 		PeaShooter(int tx, int ty);
 		~PeaShooter();
-		ObjectSignal getSignal();
 };
 
 #define SNOWPEA_HP              150
@@ -260,7 +260,6 @@ class SnowPea:public Plant{
 	public:
 		SnowPea(int tx, int ty);
 		~SnowPea();
-		ObjectSignal getSignal();
 };
 
 #define MELONPULT_HP              125
@@ -275,7 +274,6 @@ class MelonPult:public Plant{
 	public:
 		MelonPult(int tx, int ty);
 		~MelonPult();
-		ObjectSignal getSignal();
 };
 
 #define SNOWMELON_HP              125
@@ -290,7 +288,6 @@ class SnowMelon:public Plant{
 	public:
 		SnowMelon(int tx, int ty);
 		~SnowMelon();
-		ObjectSignal getSignal();
 };
 
 #define SPIKEWEED_HP              150

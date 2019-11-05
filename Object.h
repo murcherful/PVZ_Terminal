@@ -27,6 +27,7 @@ using namespace std;
 #define OBJ_TYPE_SNOWMELON        53
 #define OBJ_TYPE_SPIKEWEED        63
 #define OBJ_TYPE_GARLIC           73
+#define OBJ_TYPE_CHOMPER      	  83
 
 #define OBJ_TYPE_NORMALZOMBIE     14
 #define OBJ_TYPE_CONEZOMBIE       24
@@ -313,12 +314,31 @@ class SpikeWeed:public Plant{
 #define GARLIC_ATTACK_SPEED    10
 #define GARLIC_NEED_SUN_NUMBER 10
 #define GARLIC_COOLDOWN_TIME   120
+#define GARLIC_HP_DESC         10
 
 class Garlic:public Plant{
 	private:
 	public:
 		Garlic(int tx, int ty);
 		~Garlic();
+		void interactive(Zombie* z);
+};
+
+#define CHOMPER_HP              		100
+#define CHOMPER_ATTACK          		(-1)
+#define CHOMPER_DEFENSE         		50
+#define CHOMPER_ATTACK_SPEED    		250
+#define CHOMPER_NEED_SUN_NUMBER 		10
+#define CHOMPER_COOLDOWN_TIME   		120
+#define CHOMPER_ATTACK_DIS   			2
+
+class Chomper:public Plant{
+	private:
+	public:
+		Chomper(int tx, int ty);
+		~Chomper();
+		void update();
+		void draw();
 		void interactive(Zombie* z);
 };
 

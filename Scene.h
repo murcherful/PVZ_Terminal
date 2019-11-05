@@ -73,6 +73,7 @@ class GroundScene{
 		int sunVectorN;
 		Suns* suns[GSBH][GSBW];
 		Plant* plants[GSBH][GSBW];
+		int state;
 
 		GroundScene(int tx, int ty);
 		~GroundScene();
@@ -88,6 +89,7 @@ class GroundScene{
 		void processSignal(SceneSignal& signal);
 		void processObjSignal(ObjectSignal& signal);
 		void genPlant(int x, int y, int type);
+		void setState(int state);
 };
 
 class Scene{

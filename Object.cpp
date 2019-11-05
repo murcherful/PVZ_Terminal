@@ -83,7 +83,7 @@ Charactor::~Charactor(){
 }
 
 void Charactor::defend(int objAttack){
-	if(attack == -1){
+	if(objAttack == -1){
 		hp = 0;
 		isDead = 1;
 	}
@@ -405,7 +405,48 @@ Garlic::~Garlic(){
 void Garlic::interactive(Zombie* z){
 	if(z->getY() == getY() && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
 		z->randomUpDonw();	
+		hp -= GARLIC_HP_DESC;
 	}	
+}
+
+Chomper::Chomper(int tx, int ty):Plant(tx, ty, OBJ_TYPE_CHOMPER, CHOMPER_HP, CHOMPER_ATTACK, CHOMPER_DEFENSE, CHOMPER_ATTACK_SPEED, "Chomper", PURPLE, CHOMPER_NEED_SUN_NUMBER, CHOMPER_COOLDOWN_TIME, -1, 1){
+
+}
+
+Chomper::~Chomper(){
+
+}
+
+
+void Chomper::update(){
+	if(attackCount != 0){
+		attackCount--;
+	}
+	if(hp <= 0){
+		isDead = 1;
+	}
+}
+
+void Chomper::draw(){
+	std::stringstream hpString;
+	hpString << "HP: " << hp << " ";
+		drawText(x, y, hpString.str(), WHITE, RED);
+	if(attackCount != 0){
+		drawText(x, y+1, name, WHITE, BLACK);
+	}
+	else{
+		drawText(x, y+1, name, WHITE, color);
+	}
+
+}
+
+void Chomper::interactive(Zombie* z){
+	if(getY() == z->getY() && getX()+getW()+CHOMPER_ATTACK_DIS >= z->getX() && getX() <= z->getX()){
+		if(attackCount == 0){
+			z->defend(getAttack());
+			attackCount = attackSpeed;
+		}
+	}
 }
 
 Bullet::Bullet(int tx, int ty, int ttype, int tspeed, int tattack, int teffection, std::string tname, int tcolor):Object(tx, ty, ttype){

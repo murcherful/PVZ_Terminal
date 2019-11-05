@@ -142,6 +142,7 @@ void StateScene::addPlant(){
 	plants.push_back(new SnowMelon(0, 0));
 	plants.push_back(new SpikeWeed(0, 0));
 	plants.push_back(new Garlic(0, 0));
+	plants.push_back(new Chomper(0, 0));
 
 
 	for(int i = 0; i < plants.size(); ++i){
@@ -176,15 +177,16 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
 	objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+1*BLOCKW));
 	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
-	objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW));
+	/* objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+2*BLOCKW)); */
+	genPlant(4, 1, OBJ_TYPE_CHOMPER);
 	/* genPlant(0, 0, OBJ_TYPE_SNOWPEA); */
 	/* genPlant(0, 1, OBJ_TYPE_SNOWMELON); */
-	genPlant(6, 0, OBJ_TYPE_SPIKEWEED);
-	genPlant(6, 2, OBJ_TYPE_SPIKEWEED);
-	genPlant(6, 1, OBJ_TYPE_GARLIC);
-	genPlant(0, 0, OBJ_TYPE_PEASHOOTER);
-	genPlant(0, 2, OBJ_TYPE_SNOWPEA);
+	/* genPlant(6, 0, OBJ_TYPE_SPIKEWEED); */
+	/* genPlant(6, 2, OBJ_TYPE_SPIKEWEED); */
+	/* genPlant(6, 1, OBJ_TYPE_GARLIC); */
+	/* genPlant(0, 0, OBJ_TYPE_PEASHOOTER); */
+	/* genPlant(0, 2, OBJ_TYPE_SNOWPEA); */
 	/* genPlant(6, 1, OBJ_TYPE_SPIKEWEED); */
 	/* genPlant(0, 2, OBJ_TYPE_SNOWMELON); */
 	/* genPlant(0, 0, OBJ_TYPE_PEASHOOTER); */
@@ -205,8 +207,16 @@ void GroundScene::initSun(){
 
 void GroundScene::draw(){
 	drawRect(x, y, w, h, DARKGREEN);
-	drawLine(x+1+3-1, y+1, h-2, 0, LIGHTYELLOW);	
-	drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, GRAY);
+	drawLine(x+1+3-1, y+1, h-2, 0, LIGHTYELLOW);
+	if(state == STATE_NORMAL){
+		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, GRAY);
+	}
+	else if(state == STATE_PLANT){
+		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, DARKGREEN);
+	}
+	else if(state == STATE_REMOVE){
+		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, RED);
+	}
 	for(int i = 0; i < objects.size(); ++i){
 		objects[i]->draw();
 	}
@@ -357,6 +367,9 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		else if(type == OBJ_TYPE_GARLIC){
 			plants[yIndex][xIndex] = new Garlic(tx, ty);
 		}
+		else if(type == OBJ_TYPE_CHOMPER){
+			plants[yIndex][xIndex] = new Chomper(tx, ty);
+		}
 		objects.push_back(plants[yIndex][xIndex]);
 	}
 }
@@ -382,6 +395,10 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 		}
 
 	}
+}
+
+void GroundScene::setState(int state){
+	this->state = state;
 }
 
 Scene::Scene(int tx, int ty){
@@ -443,4 +460,5 @@ void Scene::process(){
 void Scene::changeState(){
 	state = (state+1)%STATE_NUMBER;
 	ss->setState(state);
+	gs->setState(state);
 }

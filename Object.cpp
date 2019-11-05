@@ -140,11 +140,15 @@ int Charactor::getW(){
 	return name.length()/2;
 }
 
-Zombie::Zombie(int tx, int ty, int ttype, int thp, int attack, int tdefense, int tattackSpeed, std::string tname, int color, int speed):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
+Zombie::Zombie(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tspeed):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
 	speed = tspeed;
 	speedCopy = tspeed;
 	moveCount = 0;
 	slowDownCount = 0;
+}
+
+Zombie::~Zombie(){
+
 }
 
 void Zombie::update(){
@@ -161,10 +165,20 @@ void Zombie::update(){
 	}
 }
 
+void Zombie::draw(){
+	std::stringstream hpString;
+	hpString << "HP: " << hp << " ";
+	if(slowDownCount != 0){
+		drawText(x, y, hpString.str(), WHITE, LIGHTBLUE);
+	}
+	else{
+		drawText(x, y, hpString.str(), WHITE, RED);
+	}
+	drawText(x, y+1, name, WHITE, color);
+}
+
 void Zombie::interactive(Plant* p){
-	if(p->getIsZombieValid() && 
-			((speed < 0 && p->getX()+p->getW()+ATTACK_MAX_DIS >= getX()) || 
-			 (speed > 0 && getX()+getW()+ATTACK_MAX_DIS >= p->getX()))){
+	if(p->getIsZombieValid() && getY() == p->getY() && (p->getX()+p->getW()+ATTACK_MAX_DIS >= getX() && p->getX() <= getX())){
 		if(!getIsAttackStart()){
 			startAttack();
 		}
@@ -235,7 +249,7 @@ void NewsZombie::update(){
 	}
 }
 
-Plant::Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime, int tbulletType, int tisZombieValid):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
+Plant::Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime, int tbulletType, bool tisZombieValid):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){
 	needSunNumber = tneedSunNumber;
 	coolDownTime = tcoolDownTime;
 	bulletType = tbulletType;
@@ -272,8 +286,8 @@ void Plant::interactive(Zombie* z){
 		}
 	}
 	else if(attack != 0){
-		if(getX()+getW()+ATTACK_MAX_DIS >= z->getX()){
-			if(!getIsAttackStart){
+		if(getY() == z->getY() && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && getX() <= z->getX()){
+			if(!getIsAttackStart()){
 				startAttack();
 			}
 			else if(getIsAttack()){
@@ -289,18 +303,20 @@ PlantInfo Plant::getInfo(){
 }
 
 ObjectSignal Plant::getSignal(){
-	ObjectSignal signal;
-	signal.type = OBJ_SIGNAL_NULL;
+	ObjectSignal signal(OBJ_SIGNAL_NULL, 0);
 	if(bulletType != -1){
-		signal.type = OBJ_SIGNAL_GEN_BULLET;
-		signal.data = bulletType;
-		signal.x = x;
-		signal.y = y;
+		if(getIsAttack()){
+			signal.type = OBJ_SIGNAL_GEN_BULLET;
+			signal.data = bulletType;
+			signal.x = x;
+			signal.y = y;
+			stopAttack();
+		}	
 	}
 	return signal;
 }
 
-SunFlower::SunFlower(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SUNFLOWER, SUNFLOWER_HP, SUNFLOWER_ATTACK, SUNFLOWER_DEFENSE, SUNFLOWER_ATTACK_SPEED, "SunFlower", SUNFLOWER_NEED_SUN_NUMBER, SUNFLOWER_COOLDOWN_TIME, -1, 1){
+SunFlower::SunFlower(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SUNFLOWER, SUNFLOWER_HP, SUNFLOWER_ATTACK, SUNFLOWER_DEFENSE, SUNFLOWER_ATTACK_SPEED, "SunFlower", YELLOW, SUNFLOWER_NEED_SUN_NUMBER, SUNFLOWER_COOLDOWN_TIME, -1, 1){
 	genSunCount = 0;
 	genSunCount = SUNFLOWER_GEN_SUN_SPEED;
 }
@@ -310,8 +326,7 @@ SunFlower::~SunFlower(){
 }
 
 ObjectSignal SunFlower::getSignal(){
-	ObjectSignal signal;
-	signal.type = OBJ_SIGNAL_NULL;
+	ObjectSignal signal(OBJ_SIGNAL_NULL, 0);
 	if(genSunCount==1){
 		signal.type = OBJ_SIGNAL_GEN_SUN;
 		signal.x = x;
@@ -325,7 +340,7 @@ void SunFlower::update(){
 	genSunCount = (genSunCount+1)%genSunSpeed;
 }
 
-PeaShooter::PeaShooter(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_PEASHOOTER, PEASHOOTER_HP, PEASHOOTER_ATTACK, PEASHOOTER_DEFENSE, PEASHOOTER_ATTACK_SPEED, "PeaShooter", PEASHOOTER_NEED_SUN_NUMBER, PEASHOOTER_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+PeaShooter::PeaShooter(int tx, int ty):Plant(tx, ty, OBJ_TYPE_PEASHOOTER, PEASHOOTER_HP, PEASHOOTER_ATTACK, PEASHOOTER_DEFENSE, PEASHOOTER_ATTACK_SPEED, "PeaShooter", GREEN, PEASHOOTER_NEED_SUN_NUMBER, PEASHOOTER_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
 
 }
 
@@ -333,7 +348,7 @@ PeaShooter::~PeaShooter(){
 
 }
 
-SnowPea::SnowPea(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SNOWPEA, SNOWPEA_HP, SNOWPEA_ATTACK, SNOWPEA_DEFENSE, SNOWPEA_ATTACK_SPEED, "SnowPea", SNOWPEA_NEED_SUN_NUMBER, SNOWPEA_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+SnowPea::SnowPea(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SNOWPEA, SNOWPEA_HP, SNOWPEA_ATTACK, SNOWPEA_DEFENSE, SNOWPEA_ATTACK_SPEED, "SnowPea", BLUE, SNOWPEA_NEED_SUN_NUMBER, SNOWPEA_COOLDOWN_TIME, OBJ_TYPE_SNOWBULLET, 1){
 
 }
 
@@ -341,7 +356,7 @@ SnowPea::~SnowPea(){
 
 }
 
-MelonPult::MelonPult(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_MELONPULT, MELONPULT_HP, MELONPULT_ATTACK, MELONPULT_DEFENSE, MELONPULT_ATTACK_SPEED, "MelonPult", MELONPULT_NEED_SUN_NUMBER, MELONPULT_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+MelonPult::MelonPult(int tx, int ty):Plant(tx, ty, OBJ_TYPE_MELONPULT, MELONPULT_HP, MELONPULT_ATTACK, MELONPULT_DEFENSE, MELONPULT_ATTACK_SPEED, "MelonPult", GREEN, MELONPULT_NEED_SUN_NUMBER, MELONPULT_COOLDOWN_TIME, OBJ_TYPE_MELONBULLET, 1){
 
 }
 
@@ -349,7 +364,7 @@ MelonPult::~MelonPult(){
 
 }
 
-SnowMelon::SnowMelon(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SNOWMELON, SNOWMELON_HP, SNOWMELON_ATTACK, SNOWMELON_DEFENSE, SNOWMELON_ATTACK_SPEED, "SnowMelon", SNOWMELON_NEED_SUN_NUMBER, SNOWMELON_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+SnowMelon::SnowMelon(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SNOWMELON, SNOWMELON_HP, SNOWMELON_ATTACK, SNOWMELON_DEFENSE, SNOWMELON_ATTACK_SPEED, "SnowMelon", BLUE, SNOWMELON_NEED_SUN_NUMBER, SNOWMELON_COOLDOWN_TIME, OBJ_TYPE_SNOWMELONBULLET, 1){
 
 }
 
@@ -357,7 +372,7 @@ SnowMelon::~SnowMelon(){
 
 }
 
-SpikeWeed::SpikeWeed(int tx, int ty):Charactor(tx, ty, OBJ_TYPE_SPIKEWEED, SPIKEWEED_HP, SPIKEWEED_ATTACK, SPIKEWEED_DEFENSE, SPIKEWEED_ATTACK_SPEED, "SpikeWeed", SPIKEWEED_NEED_SUN_NUMBER, SPIKEWEED_COOLDOWN_TIME, -1, 0){
+SpikeWeed::SpikeWeed(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SPIKEWEED, SPIKEWEED_HP, SPIKEWEED_ATTACK, SPIKEWEED_DEFENSE, SPIKEWEED_ATTACK_SPEED, "SpikeWeed", BROWN, SPIKEWEED_NEED_SUN_NUMBER, SPIKEWEED_COOLDOWN_TIME, -1, 0){
 
 }
 
@@ -365,10 +380,10 @@ SpikeWeed::~SpikeWeed(){
 
 }
 
-void interactive(Zombie* z){
-	if(getX()+getW()+ATTACK_MAX_DIS >= z->getX() && 
+void SpikeWeed::interactive(Zombie* z){
+	if(getY() == z->getY() && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && 
 			z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
-		if(!getIsAttackStart){
+		if(!getIsAttackStart()){
 			startAttack();
 		}
 		else if(getIsAttack()){

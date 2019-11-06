@@ -6,7 +6,7 @@ StateScene::StateScene(int tx, int ty){
 	selectIndex = 0;
 	state = STATE_NORMAL;
 	score = 0;
-	sunsNumber = 8;
+	sunsNumber = 99999;
 	blockNumber = (w-2)/BLOCKW;
 	plantsNumber = blockNumber-1;
 	stateW = w-2-plantsNumber*BLOCKW;
@@ -145,6 +145,7 @@ void StateScene::addPlant(){
 	plants.push_back(new Chomper(0, 0));
 	plants.push_back(new Squash(0, 0));
 	plants.push_back(new PotatoMine(0, 0));
+	plants.push_back(new Jalapeno(0, 0));
 
 
 	for(int i = 0; i < plants.size(); ++i){
@@ -181,12 +182,16 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
 	objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+1*BLOCKW));
+	objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW));
+	objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW));
 	objects.push_back(new NormalZombie(x+1+3+7*BLOCKW+1+2, y+1+2+1*BLOCKW));
+	objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+0*BLOCKW));
+	objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+2*BLOCKW));
 	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
 	objects.push_back(new NormalZombie(x+1+3+8*BLOCKW+1+2, y+1+2+1*BLOCKW));
 	/* objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+2*BLOCKW)); */
-	genPlant(4, 1, OBJ_TYPE_POTATOMINE);
+	/* genPlant(4, 1, OBJ_TYPE_POTATOMINE); */
 	/* genPlant(0, 0, OBJ_TYPE_SNOWPEA); */
 	/* genPlant(0, 1, OBJ_TYPE_MELONPULT); */
 	/* genPlant(6, 0, OBJ_TYPE_SPIKEWEED); */
@@ -405,6 +410,9 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		else if(type == OBJ_TYPE_POTATOMINE){
 			plants[yIndex][xIndex] = new PotatoMine(tx, ty);
 		}
+		else if(type == OBJ_TYPE_JALAPENO){
+			plants[yIndex][xIndex] = new Jalapeno(tx, ty);
+		}
 		objects.push_back(plants[yIndex][xIndex]);
 	}
 }
@@ -451,6 +459,13 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 		if(tx+1 < GSBW){
 			specialColor[ty][tx+1] = signal.data;
 		}
+	}
+	else if(signal.type == OBJ_SIGNAL_LINE_COLOR){
+		int tx = (signal.x-3-1-x)/BLOCKW;
+		int ty = (signal.y-1-y)/BLOCKW;
+		for(int i = 0; i < GSBW; ++i){
+			specialColor[ty][i] = signal.data;
+		}	
 	}
 }
 

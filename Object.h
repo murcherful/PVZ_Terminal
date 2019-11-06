@@ -30,6 +30,7 @@ using namespace std;
 #define OBJ_TYPE_CHOMPER      	  83
 #define OBJ_TYPE_SQUASH           93
 #define OBJ_TYPE_POTATOMINE       103
+#define OBJ_TYPE_JALAPENO         113
 
 #define OBJ_TYPE_NORMALZOMBIE     14
 #define OBJ_TYPE_CONEZOMBIE       24
@@ -386,6 +387,29 @@ class PotatoMine:public Plant{
 
 		PotatoMine(int tx, int ty);
 		~PotatoMine();
+		void update();
+		void draw();
+		void interactive(Zombie* z);
+		ObjectSignal getSignal();
+};
+
+#define JALAPENO_HP              		100
+#define JALAPENO_ATTACK          		-1
+#define JALAPENO_DEFENSE         		50
+#define JALAPENO_ATTACK_SPEED    		250
+#define JALAPENO_NEED_SUN_NUMBER 		1
+#define JALAPENO_COOLDOWN_TIME   		120
+#define JALAPENO_READY_COUNT          	10
+
+class Jalapeno:public Plant{
+	private:
+	public:
+		int isBreak;
+		int readyCount;
+		int stayCount;
+
+		Jalapeno(int tx, int ty);
+		~Jalapeno();
 		void update();
 		void draw();
 		void interactive(Zombie* z);

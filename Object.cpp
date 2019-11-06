@@ -555,13 +555,14 @@ void PotatoMine::update(){
 
 void PotatoMine::draw(){
 	std::stringstream hpString;
-	hpString << " HP: " << hp << " ";
-	drawText(x, y, hpString.str(), WHITE, RED);
 	if(readyCount != 0){
 		drawText(x, y+1, name, WHITE, BLACK);
 	}
-	else{
+	else if(isBreak == 0){
 		drawText(x, y+1, name, WHITE, color);
+	}
+	else{
+		drawText(x, y+1, name, WHITE, BLACK);
 	}
 
 }
@@ -574,7 +575,7 @@ void PotatoMine::interactive(Zombie* z){
 		if(getY() == z->getY() && getX()+getW()+BLOCKW >= z->getX() && getX()-BLOCKW <= z->getX()){
 			z->defend(getAttack());
 		}
-		else if((getY() == z->getY()+1 || getY() == z->getY()-1) && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
+		else if((getY() == z->getY()+BLOCKW || getY() == z->getY()-BLOCKW) && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
 			z->defend(getAttack());
 		}
 	}  
@@ -584,6 +585,59 @@ ObjectSignal PotatoMine::getSignal(){
 	ObjectSignal singal(OBJ_SIGNAL_NULL, 0);
 	if(isBreak > 1){
 		singal.type = OBJ_SIGNAL_CROSS_COLOR;
+		singal.data = BLACK;
+		singal.x = x;
+		singal.y = y;
+	}
+	return singal;
+}
+
+Jalapeno::Jalapeno(int tx, int ty):Plant(tx, ty, OBJ_TYPE_JALAPENO, JALAPENO_HP, JALAPENO_ATTACK, JALAPENO_DEFENSE, JALAPENO_ATTACK_SPEED, "Jalapeno", RED, JALAPENO_NEED_SUN_NUMBER, JALAPENO_COOLDOWN_TIME, -1, 0){
+	isBreak = 0;
+	readyCount = JALAPENO_READY_COUNT;
+	stayCount = 0;
+}
+
+Jalapeno::~Jalapeno(){
+
+}
+
+void Jalapeno::update(){
+	if(readyCount != 0){
+		readyCount--;
+	}
+	else if(isBreak == 0){
+		isBreak = 1;
+	}
+	if(isBreak == 2 && stayCount != 0){
+		stayCount--;
+	}
+	else if(isBreak == 2 && stayCount == 0){
+		isDead = 1;
+	}
+}
+
+void Jalapeno::draw(){
+	if(isBreak != 2){
+		drawText(x, y+1, name, WHITE, color);
+	}
+	else{
+		drawText(x, y+1, name, WHITE, BLACK);	
+	}
+}
+
+void Jalapeno::interactive(Zombie* z){
+	if(isBreak > 0 && getY() == z->getY()){
+		z->defend(getAttack());
+		stayCount = 5;
+		isBreak = 2;
+	}
+}
+
+ObjectSignal Jalapeno::getSignal(){
+	ObjectSignal singal(OBJ_SIGNAL_NULL, 0);
+	if(isBreak > 1){
+		singal.type = OBJ_SIGNAL_LINE_COLOR;
 		singal.data = BLACK;
 		singal.x = x;
 		singal.y = y;

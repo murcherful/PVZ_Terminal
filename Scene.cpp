@@ -143,6 +143,8 @@ void StateScene::addPlant(){
 	plants.push_back(new SpikeWeed(0, 0));
 	plants.push_back(new Garlic(0, 0));
 	plants.push_back(new Chomper(0, 0));
+	plants.push_back(new Squash(0, 0));
+	plants.push_back(new PotatoMine(0, 0));
 
 
 	for(int i = 0; i < plants.size(); ++i){
@@ -164,9 +166,12 @@ GroundScene::GroundScene(int tx, int ty){
 	count = 0;
 	initSun();
 	sunVectorN = GSBH*GSBW;
+	randSortCount = 0;
+	isRandSort = 0;
 	for(int i = 0; i < GSBH; ++i){
 		for(int j = 0; j < GSBW; ++j){
 			plants[i][j] = NULL;
+			specialColor[i][j] = WHITE;
 		}
 	}
 
@@ -176,12 +181,14 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
 	objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+1*BLOCKW));
+	objects.push_back(new NormalZombie(x+1+3+7*BLOCKW+1+2, y+1+2+1*BLOCKW));
 	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
+	objects.push_back(new NormalZombie(x+1+3+8*BLOCKW+1+2, y+1+2+1*BLOCKW));
 	/* objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+2*BLOCKW)); */
-	genPlant(4, 1, OBJ_TYPE_CHOMPER);
+	genPlant(4, 1, OBJ_TYPE_POTATOMINE);
 	/* genPlant(0, 0, OBJ_TYPE_SNOWPEA); */
-	/* genPlant(0, 1, OBJ_TYPE_SNOWMELON); */
+	/* genPlant(0, 1, OBJ_TYPE_MELONPULT); */
 	/* genPlant(6, 0, OBJ_TYPE_SPIKEWEED); */
 	/* genPlant(6, 2, OBJ_TYPE_SPIKEWEED); */
 	/* genPlant(6, 1, OBJ_TYPE_GARLIC); */
@@ -208,6 +215,14 @@ void GroundScene::initSun(){
 void GroundScene::draw(){
 	drawRect(x, y, w, h, DARKGREEN);
 	drawLine(x+1+3-1, y+1, h-2, 0, LIGHTYELLOW);
+	for(int i = 0; i < GSBH; ++i){
+		for(int j = 0; j < GSBW; ++j){
+			if(specialColor[i][j] != WHITE){
+				drawWholeRect(x+1+3+j*BLOCKW, y+1+i*BLOCKW, BLOCKW, BLOCKW, specialColor[i][j]);
+				specialColor[i][j] = WHITE;
+			}
+		}
+	}
 	if(state == STATE_NORMAL){
 		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, GRAY);
 	}
@@ -218,6 +233,11 @@ void GroundScene::draw(){
 		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, RED);
 	}
 	for(int i = 0; i < objects.size(); ++i){
+		if(randSortCount == 0 && i >= sunVectorN){
+			int j = rand()%(objects.size()-i)+i;
+			std::swap(objects[i], objects[j]);
+			isRandSort = 1;
+		}
 		objects[i]->draw();
 	}
 }
@@ -274,6 +294,14 @@ SceneSignal GroundScene::update(){
 		ObjectSignal os = objects[i]->getSignal();
 		processObjSignal(os);
 	}
+	if(isRandSort){
+		randSortCount = 10;
+		isRandSort = 0;
+	}
+	else if(randSortCount != 0){
+		randSortCount--;
+	}
+
 	std::stringstream debugString;
 	debugString << "n: " << objects.size();
 	drawText(0, SH+1, debugString.str(), BLACK, WHITE);
@@ -347,6 +375,7 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		int tx = x+1+3+xIndex*BLOCKW+1;
 		int ty = y+1+yIndex*BLOCKW+2;
 		if(type == OBJ_TYPE_SUNFLOWER){
+			drawText(0, SH+2, "here2", BLACK, WHITE);
 			plants[yIndex][xIndex] = new SunFlower(tx, ty);
 		}
 		else if(type == OBJ_TYPE_PEASHOOTER){
@@ -369,6 +398,12 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		}
 		else if(type == OBJ_TYPE_CHOMPER){
 			plants[yIndex][xIndex] = new Chomper(tx, ty);
+		}
+		else if(type == OBJ_TYPE_SQUASH){
+			plants[yIndex][xIndex] = new Squash(tx, ty);
+		}
+		else if(type == OBJ_TYPE_POTATOMINE){
+			plants[yIndex][xIndex] = new PotatoMine(tx, ty);
 		}
 		objects.push_back(plants[yIndex][xIndex]);
 	}
@@ -394,6 +429,28 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 			objects.push_back(new SnowMelonBullet(signal.x, signal.y+1));
 		}
 
+	}
+	else if(signal.type == OBJ_SIGNAL_SINGAL_COLOR){
+		int tx = (signal.x-3-1-x)/BLOCKW;
+		int ty = (signal.y-1-y)/BLOCKW;
+		specialColor[ty][tx] = signal.data;
+	}
+	else if(signal.type == OBJ_SIGNAL_CROSS_COLOR){
+		int tx = (signal.x-3-1-x)/BLOCKW;
+		int ty = (signal.y-1-y)/BLOCKW;
+		specialColor[ty][tx] = signal.data;
+		if(ty-1 >= 0){
+			specialColor[ty-1][tx] = signal.data;
+		}
+		if(ty+1 < GSBH){
+			specialColor[ty+1][tx] = signal.data;
+		}
+		if(tx-1 >= 0){
+			specialColor[ty][tx-1] = signal.data;
+		}
+		if(tx+1 < GSBW){
+			specialColor[ty][tx+1] = signal.data;
+		}
 	}
 }
 

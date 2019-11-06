@@ -16,6 +16,7 @@
 #define LIGHTGRAY       247
 #define LIGHTYELLOW     11
 #define LIGHTBLUE       27
+#define SQUASHGREEN     76
 
 using namespace std;
 

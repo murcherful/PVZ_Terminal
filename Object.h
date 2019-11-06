@@ -28,6 +28,8 @@ using namespace std;
 #define OBJ_TYPE_SPIKEWEED        63
 #define OBJ_TYPE_GARLIC           73
 #define OBJ_TYPE_CHOMPER      	  83
+#define OBJ_TYPE_SQUASH           93
+#define OBJ_TYPE_POTATOMINE       103
 
 #define OBJ_TYPE_NORMALZOMBIE     14
 #define OBJ_TYPE_CONEZOMBIE       24
@@ -53,6 +55,9 @@ typedef struct ObjectSignal{
 #define OBJ_SIGNAL_NULL           0
 #define OBJ_SIGNAL_GEN_SUN        1
 #define OBJ_SIGNAL_GEN_BULLET     2
+#define OBJ_SIGNAL_SINGAL_COLOR   3
+#define OBJ_SIGNAL_CROSS_COLOR    4
+#define OBJ_SIGNAL_LINE_COLOR     5
 
 class Object{
 	private:
@@ -123,6 +128,7 @@ class Zombie:public Charactor{
 		int speedCopy;
 		int moveCount;
 		int slowDownCount;
+		bool isInteractive;
 		
 		Zombie(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tspeed);
 		~Zombie();
@@ -219,7 +225,7 @@ class Plant:public Charactor{
 #define SUNFLOWER_HP              150
 #define SUNFLOWER_ATTACK          0
 #define SUNFLOWER_DEFENSE         70
-#define SUNFLOWER_ATTACK_SPEED     -1
+#define SUNFLOWER_ATTACK_SPEED    10000
 #define SUNFLOWER_NEED_SUN_NUMBER 4
 #define SUNFLOWER_COOLDOWN_TIME   70
 
@@ -325,7 +331,7 @@ class Garlic:public Plant{
 };
 
 #define CHOMPER_HP              		100
-#define CHOMPER_ATTACK          		(-1)
+#define CHOMPER_ATTACK          		-1
 #define CHOMPER_DEFENSE         		50
 #define CHOMPER_ATTACK_SPEED    		250
 #define CHOMPER_NEED_SUN_NUMBER 		10
@@ -340,6 +346,50 @@ class Chomper:public Plant{
 		void update();
 		void draw();
 		void interactive(Zombie* z);
+};
+
+#define SQUASH_HP              		100
+#define SQUASH_ATTACK          		-1
+#define SQUASH_DEFENSE         		50
+#define SQUASH_ATTACK_SPEED    		250
+#define SQUASH_NEED_SUN_NUMBER 		10
+#define SQUASH_COOLDOWN_TIME   		120
+
+class Squash:public Plant{
+	private:
+	public:
+		int isBreak;
+		int isMove;
+
+		Squash(int tx, int ty);
+		~Squash();
+		void update();
+		void draw();
+		void interactive(Zombie* z);
+		ObjectSignal getSignal();
+};
+
+#define POTATOMINE_HP              		100
+#define POTATOMINE_ATTACK          		-1
+#define POTATOMINE_DEFENSE         		50
+#define POTATOMINE_ATTACK_SPEED    		250
+#define POTATOMINE_NEED_SUN_NUMBER 		10
+#define POTATOMINE_COOLDOWN_TIME   		120
+#define POTATOMINE_READY_COUNT          100
+
+class PotatoMine:public Plant{
+	private:
+	public:
+		int isBreak;
+		int readyCount;
+		int stayCount;
+
+		PotatoMine(int tx, int ty);
+		~PotatoMine();
+		void update();
+		void draw();
+		void interactive(Zombie* z);
+		ObjectSignal getSignal();
 };
 
 #define BULLET_EFF_NORMAL      0

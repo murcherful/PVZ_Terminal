@@ -74,7 +74,7 @@ Charactor::Charactor(int tx, int ty, int ttype, int thp, int tattack, int tdefen
 	defense = tdefense;
 	attack = tattack;
 	attackSpeed = tattackSpeed;	
-	name = tname;
+	name = " "+tname+" ";
 	color = tcolor;
 }
 
@@ -91,7 +91,12 @@ void Charactor::defend(int objAttack){
 	if(hurt <= 0){
 		hurt = 1;
 	}
-	hp -= hurt;
+	if(hp-hurt<0){
+		hp = 0;
+	}
+	else{
+		hp -= hurt;
+	}
 }
 
 bool Charactor::getIsAttack(){
@@ -126,7 +131,7 @@ void Charactor::stopAttack(){
 
 void Charactor::draw(){
 	std::stringstream hpString;
-	hpString << "HP: " << hp << " ";
+	hpString << " HP: " << hp << " ";
 	drawText(x, y, hpString.str(), WHITE, RED);
 	drawText(x, y+1, name, WHITE, color);
 }
@@ -145,6 +150,7 @@ Zombie::Zombie(int tx, int ty, int ttype, int thp, int tattack, int tdefense, in
 	speedCopy = tspeed;
 	moveCount = 0;
 	slowDownCount = 0;
+	isInteractive = 0;
 }
 
 Zombie::~Zombie(){
@@ -153,6 +159,9 @@ Zombie::~Zombie(){
 
 void Zombie::update(){
 	Charactor::update();
+	if(!isInteractive){
+		stopAttack();
+	}
 	if(moveCount == speed-1){
 		x--;
 		moveCount = 0;
@@ -163,11 +172,12 @@ void Zombie::update(){
 	else if(!Charactor::getIsAttackStart()){
 		moveCount++;
 	}
+	isInteractive = 0;
 }
 
 void Zombie::draw(){
 	std::stringstream hpString;
-	hpString << "HP: " << hp << " ";
+	hpString << " HP: " << hp << " ";
 	if(slowDownCount != 0){
 		drawText(x, y, hpString.str(), WHITE, LIGHTBLUE);
 	}
@@ -178,6 +188,7 @@ void Zombie::draw(){
 }
 
 void Zombie::interactive(Plant* p){
+	isInteractive = 1;
 	if(p->getIsZombieValid() && getY() == p->getY() && (p->getX()+p->getW()+ATTACK_MAX_DIS >= getX() && p->getX() <= getX())){
 		if(!getIsAttackStart()){
 			startAttack();
@@ -318,7 +329,7 @@ ObjectSignal Plant::getSignal(){
 
 SunFlower::SunFlower(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SUNFLOWER, SUNFLOWER_HP, SUNFLOWER_ATTACK, SUNFLOWER_DEFENSE, SUNFLOWER_ATTACK_SPEED, "SunFlower", YELLOW, SUNFLOWER_NEED_SUN_NUMBER, SUNFLOWER_COOLDOWN_TIME, -1, 1){
 	genSunCount = 0;
-	genSunCount = SUNFLOWER_GEN_SUN_SPEED;
+	genSunSpeed = SUNFLOWER_GEN_SUN_SPEED;
 }
 
 SunFlower::~SunFlower(){
@@ -429,7 +440,7 @@ void Chomper::update(){
 
 void Chomper::draw(){
 	std::stringstream hpString;
-	hpString << "HP: " << hp << " ";
+	hpString << " HP: " << hp << " ";
 		drawText(x, y, hpString.str(), WHITE, RED);
 	if(attackCount != 0){
 		drawText(x, y+1, name, WHITE, BLACK);
@@ -447,6 +458,137 @@ void Chomper::interactive(Zombie* z){
 			attackCount = attackSpeed;
 		}
 	}
+}
+
+Squash::Squash(int tx, int ty):Plant(tx, ty, OBJ_TYPE_SQUASH, SQUASH_HP, SQUASH_ATTACK, SQUASH_DEFENSE, SQUASH_ATTACK_SPEED, "Squash", SQUASHGREEN, SQUASH_NEED_SUN_NUMBER, SQUASH_COOLDOWN_TIME, -1, 0){
+	isBreak = 0;
+	isMove = 0;
+}
+
+Squash::~Squash(){
+
+}
+
+
+void Squash::update(){
+	if(isBreak == 1){
+		if(x + BLOCKW < SW){
+			x+=BLOCKW;
+		}
+		isMove = 6;
+		isBreak = 2;
+	}
+	else if(isBreak == 2 && isMove != 0){
+		isMove--;
+	}	
+	else if(isBreak == 2 && isMove == 0){
+		isDead = 1;
+	}
+}
+
+void Squash::draw(){
+	std::stringstream hpString;
+	hpString << " HP: " << hp << " ";
+		drawText(x, y, hpString.str(), WHITE, RED);
+	if(isBreak==2){
+		drawText(x, y+1, name, WHITE, DARKGREEN);
+	}
+	else{
+		drawText(x, y+1, name, WHITE, color);
+	}
+
+}
+
+void Squash::interactive(Zombie* z){
+	if(isBreak == 0 && getY() == z->getY() && getX()+BLOCKW >= z->getX() && getX() <= z->getX()){
+		if(isMove == 0){
+			z->defend(getAttack());
+			isBreak = 1;
+		}
+	}
+	else if(isBreak == 2 && getY() == z->getY() && getX()+BLOCKW*0.5 >= z->getX() && getX()-BLOCKW*0.5 <= z->getX()){
+		if(isMove == 0){
+			z->defend(getAttack());
+		}
+	}
+}
+
+ObjectSignal Squash::getSignal(){
+	ObjectSignal singal(OBJ_SIGNAL_NULL, 0);
+	if(isBreak == 2){
+		singal.type = OBJ_SIGNAL_SINGAL_COLOR;
+		singal.data = SQUASHGREEN;
+		singal.x = x;
+		singal.y = y;
+	}
+	return singal;
+}
+
+PotatoMine::PotatoMine(int tx, int ty):Plant(tx, ty, OBJ_TYPE_POTATOMINE, POTATOMINE_HP, POTATOMINE_ATTACK, POTATOMINE_DEFENSE, POTATOMINE_ATTACK_SPEED, "PotatoMine", BROWN, POTATOMINE_NEED_SUN_NUMBER, POTATOMINE_COOLDOWN_TIME, -1, 0){
+	isBreak = 0;
+	readyCount = POTATOMINE_READY_COUNT;
+	stayCount = 0;
+}
+
+PotatoMine::~PotatoMine(){
+
+}
+
+void PotatoMine::update(){
+	if(readyCount != 0){
+		readyCount--;
+	}
+	if(isBreak == 1){
+		isBreak = 2;
+	}
+	else if(isBreak == 2){
+		stayCount = 5;
+		isBreak = 3;
+	}
+	else if(stayCount != 0){
+		stayCount--;
+	}
+	if(isBreak == 3 && stayCount == 0){
+		isDead = 1;
+	}
+}
+
+void PotatoMine::draw(){
+	std::stringstream hpString;
+	hpString << " HP: " << hp << " ";
+	drawText(x, y, hpString.str(), WHITE, RED);
+	if(readyCount != 0){
+		drawText(x, y+1, name, WHITE, BLACK);
+	}
+	else{
+		drawText(x, y+1, name, WHITE, color);
+	}
+
+}
+
+void PotatoMine::interactive(Zombie* z){
+	if(readyCount == 0 && isBreak == 0 && getY() == z->getY() && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && getX() <= z->getX()){
+		isBreak = 1;
+	}
+	else if(isBreak == 2){
+		if(getY() == z->getY() && getX()+getW()+BLOCKW >= z->getX() && getX()-BLOCKW <= z->getX()){
+			z->defend(getAttack());
+		}
+		else if((getY() == z->getY()+1 || getY() == z->getY()-1) && getX()+getW()+ATTACK_MAX_DIS >= z->getX() && z->getX()+z->getW()+ATTACK_MAX_DIS >= getX()){
+			z->defend(getAttack());
+		}
+	}  
+}
+
+ObjectSignal PotatoMine::getSignal(){
+	ObjectSignal singal(OBJ_SIGNAL_NULL, 0);
+	if(isBreak > 1){
+		singal.type = OBJ_SIGNAL_CROSS_COLOR;
+		singal.data = BLACK;
+		singal.x = x;
+		singal.y = y;
+	}
+	return singal;
 }
 
 Bullet::Bullet(int tx, int ty, int ttype, int tspeed, int tattack, int teffection, std::string tname, int tcolor):Object(tx, ty, ttype){

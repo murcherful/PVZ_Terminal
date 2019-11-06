@@ -74,6 +74,9 @@ class GroundScene{
 		Suns* suns[GSBH][GSBW];
 		Plant* plants[GSBH][GSBW];
 		int state;
+		int randSortCount;
+		bool isRandSort;
+		int specialColor[GSBH][GSBW];
 
 		GroundScene(int tx, int ty);
 		~GroundScene();

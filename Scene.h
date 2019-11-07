@@ -51,6 +51,7 @@ class StateScene{
 		int stateW;
 		std::vector<Plant*> plants;
 		std::vector<PlantInfo> infos;
+		int level;
 		
 		StateScene(int tx, int ty);
 		~StateScene();
@@ -81,6 +82,7 @@ class GroundScene{
 		int specialColor[GSBH][GSBW];
 		int score;
 		bool weedKiller[GSBH];
+		int level;
 
 		GroundScene(int tx, int ty);
 		~GroundScene();
@@ -107,6 +109,7 @@ class Scene{
 		StateScene* ss;
 		GroundScene* gs;
 		int state;
+		int level;
 
 		Scene(int tx, int ty);
 		~Scene();

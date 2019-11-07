@@ -10,6 +10,7 @@ StateScene::StateScene(int tx, int ty){
 	blockNumber = (w-2)/BLOCKW;
 	plantsNumber = blockNumber-1;
 	stateW = w-2-plantsNumber*BLOCKW;
+	level = 0;
 	addPlant();
 }
 
@@ -179,6 +180,7 @@ GroundScene::GroundScene(int tx, int ty){
 	randSortCount = 0;
 	isRandSort = 0;
 	score = 0;
+	level = 0;
 	for(int i = 0; i < GSBH; ++i){
 		weedKiller[i] = 1;
 		for(int j = 0; j < GSBW; ++j){
@@ -192,7 +194,8 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new PeaShooter(x+1+3+1, y+1+2+BLOCKW)); */
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
-	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
+	/* objects.push_back(new DoorZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW)); */
+	objects.push_back(new DancingZombie(x+1+3+8*BLOCKW+1, y+1+2+0*BLOCKW));
 	/* weedKiller[1] = 0; */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW)); */
@@ -204,10 +207,10 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* genPlant(4, 1, OBJ_TYPE_POTATOMINE); */
-	/* genPlant(0, 0, OBJ_TYPE_SNOWPEA); */
+	/* genPlant(0, 1, OBJ_TYPE_SNOWPEA); */
 	/* genPlant(0, 1, OBJ_TYPE_MELONPULT); */
 	/* genPlant(6, 0, OBJ_TYPE_SPIKEWEED); */
-	/* genPlant(6, 2, OBJ_TYPE_SPIKEWEED); */
+	/* genPlant(6, 2, OBJ_TYPE_WALLNUT); */
 	/* genPlant(6, 1, OBJ_TYPE_GARLIC); */
 	/* genPlant(0, 0, OBJ_TYPE_PEASHOOTER); */
 	/* genPlant(0, 2, OBJ_TYPE_SNOWPEA); */
@@ -521,6 +524,22 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 			state = STATE_OVER;
 		}
 	}
+	else if(signal.type == OBJ_SIGNAL_GEN_ZOMBIE){
+		int tx = signal.x;
+		int ty = signal.y;
+		if(tx - BLOCKW >= x+1+3){
+			objects.push_back(new BackupZombie(tx-BLOCKW, ty));
+		}
+		if(tx + BLOCKW <= x+GSW){
+			objects.push_back(new BackupZombie(tx+BLOCKW, ty));
+		}
+		if(ty - BLOCKW >= y+1){
+			objects.push_back(new BackupZombie(tx, ty-BLOCKW));
+		}
+		if(ty + BLOCKW <= y+GSH){
+			objects.push_back(new BackupZombie(tx, ty+BLOCKW));
+		}
+	}
 }
 
 void GroundScene::setState(int state){
@@ -530,6 +549,7 @@ void GroundScene::setState(int state){
 Scene::Scene(int tx, int ty){
 	x = tx; y = ty; w = SW; h = SH;
 	state = STATE_NORMAL;
+	level = 0;
 	ss = new StateScene(x, y);
 	gs = new GroundScene(x, y+SSH);
 }

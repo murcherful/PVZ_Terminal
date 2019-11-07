@@ -17,6 +17,8 @@
 #define LIGHTYELLOW     11
 #define LIGHTBLUE       27
 #define SQUASHGREEN     76
+#define PINK            165
+#define DARKRED         88
 
 using namespace std;
 

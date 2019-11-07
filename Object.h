@@ -38,6 +38,10 @@ using namespace std;
 #define OBJ_TYPE_CONEZOMBIE       24
 #define OBJ_TYPE_BUCKETZOMBIE     34
 #define OBJ_TYPE_NEWSZOMBIE       44
+#define OBJ_TYPE_DOORZOMBIE       54
+#define OBJ_TYPE_POLEZOMBIE       64
+#define OBJ_TYPE_DANCINGZOMBIE    74
+#define OBJ_TYPE_BACKUPZOMBIE     84
 
 #define OBJ_TYPE_PEABULLET        15
 #define OBJ_TYPE_SNOWBULLET       25
@@ -63,6 +67,7 @@ typedef struct ObjectSignal{
 #define OBJ_SIGNAL_LINE_COLOR     5
 #define OBJ_SIGNAL_ADD_SCORE      6
 #define OBJ_SIGNAL_GET_LINE       7
+#define OBJ_SIGNAL_GEN_ZOMBIE     8
 
 class Object{
 	private:
@@ -196,6 +201,69 @@ class NewsZombie:public Zombie{
 		NewsZombie(int tx, int ty);
 		~NewsZombie();
 		void update();
+};
+
+#define DOORZOMBIE_HP             400
+#define DOORZOMBIE_ATTACK         50
+#define DOORZOMBIE_DEFENSE        150
+#define DOORZOMBIE_ATTACK_SPEED   30
+#define DOORZOMBIE_SPEED          16
+
+class DoorZombie:public Zombie{
+	private:
+	public:
+		DoorZombie(int tx, int ty);
+		~DoorZombie();
+};
+
+
+#define POLEZOMBIE_HP             150
+#define POLEZOMBIE_ATTACK         50
+#define POLEZOMBIE_DEFENSE        50
+#define POLEZOMBIE_ATTACK_SPEED   30
+#define POLEZOMBIE_SPEED          5
+
+class PoleZombie:public Zombie{
+	private:
+	public:
+		bool isJump;
+
+		PoleZombie(int tx, int ty);
+		~PoleZombie();
+		void interactive(Plant* p);
+};
+
+#define DANCINGZOMBIE_HP             200
+#define DANCINGZOMBIE_ATTACK         50
+#define DANCINGZOMBIE_DEFENSE        100
+#define DANCINGZOMBIE_ATTACK_SPEED   30
+#define DANCINGZOMBIE_SPEED          8
+#define DANCINGZOMBIE_GEN_ZOM_SPEED  100
+
+class DancingZombie:public Zombie{
+	private:
+	public:
+		int genZomCount;
+		int genZomSpeed;
+
+		DancingZombie(int tx, int ty);
+		~DancingZombie();
+		void update();
+		ObjectSignal getSignal();
+};
+
+#define BACKUPZOMBIE_HP             150
+#define BACKUPZOMBIE_ATTACK         50
+#define BACKUPZOMBIE_DEFENSE        50
+#define BACKUPZOMBIE_ATTACK_SPEED   30
+#define BACKUPZOMBIE_SPEED          10
+
+class BackupZombie:public Zombie{
+	private:
+	public:
+
+		BackupZombie(int tx, int ty);
+		~BackupZombie();
 };
 
 typedef struct PlantInfo{
@@ -438,7 +506,7 @@ class WallNut:public Plant{
 #define REPEATOR_HP              		125
 #define REPEATOR_ATTACK          		0
 #define REPEATOR_DEFENSE         		50
-#define REPEATOR_ATTACK_SPEED    		6
+#define REPEATOR_ATTACK_SPEED    		7
 #define REPEATOR_NEED_SUN_NUMBER 		1
 #define REPEATOR_COOLDOWN_TIME   		80
 

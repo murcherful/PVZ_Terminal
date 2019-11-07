@@ -162,7 +162,7 @@ void Zombie::update(){
 	if(!isInteractive){
 		stopAttack();
 	}
-	if(moveCount == speed-1){
+	if(moveCount >= speed-1){
 		x--;
 		moveCount = 0;
 	}
@@ -272,6 +272,74 @@ void NewsZombie::update(){
 	if(hp < 150){
 		speed = speedCopy*0.5;
 	}
+}
+
+DoorZombie::DoorZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_DOORZOMBIE, DOORZOMBIE_HP, DOORZOMBIE_ATTACK, DOORZOMBIE_DEFENSE, DOORZOMBIE_ATTACK_SPEED, "DoorZ", LIGHTGRAY, DOORZOMBIE_SPEED){
+
+}
+
+DoorZombie::~DoorZombie(){
+
+}
+
+PoleZombie::PoleZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_POLEZOMBIE, POLEZOMBIE_HP, POLEZOMBIE_ATTACK, POLEZOMBIE_DEFENSE, POLEZOMBIE_ATTACK_SPEED, "PoleZ", PINK, POLEZOMBIE_SPEED){
+	isJump = 0;
+}
+
+PoleZombie::~PoleZombie(){
+
+}
+
+void PoleZombie::interactive(Plant* p){
+	if(p->getIsZombieValid() && getY() == p->getY() && (p->getX()+p->getW()+ATTACK_MAX_DIS >= getX() && p->getX() <= getX())){
+		isInteractive = 1;
+		if(isJump == 0){
+			x -= BLOCKW;
+			isJump = 1;
+			speed = NORMALZOMBIE_SPEED;
+			return;
+		}
+		if(!getIsAttackStart()){
+			startAttack();
+		}
+		else if(getIsAttack()){
+			p->defend(getAttack());
+			stopAttack();
+		}
+	}
+}
+
+DancingZombie::DancingZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_DANCINGZOMBIE, DANCINGZOMBIE_HP, DANCINGZOMBIE_ATTACK, DANCINGZOMBIE_DEFENSE, DANCINGZOMBIE_ATTACK_SPEED, "DancingZ", DARKRED, DANCINGZOMBIE_SPEED){
+	genZomCount = 0;
+	genZomSpeed = DANCINGZOMBIE_GEN_ZOM_SPEED;
+}
+
+DancingZombie::~DancingZombie(){
+
+}
+
+void DancingZombie::update(){
+	Zombie::update();
+	genZomCount = (genZomCount+1)%genZomSpeed;
+}
+
+ObjectSignal DancingZombie::getSignal(){
+	ObjectSignal signal(OBJ_SIGNAL_NULL, 0);
+	if(genZomCount == genZomSpeed-1){
+		signal.type = OBJ_SIGNAL_GEN_ZOMBIE;
+		signal.data = OBJ_TYPE_BACKUPZOMBIE;
+		signal.x = x;
+		signal.y = y;
+	}
+	return signal;
+}
+
+BackupZombie::BackupZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_BACKUPZOMBIE, BACKUPZOMBIE_HP, BACKUPZOMBIE_ATTACK, BACKUPZOMBIE_DEFENSE, BACKUPZOMBIE_ATTACK_SPEED, "BackupZ", YELLOW, BACKUPZOMBIE_SPEED){
+
+}
+
+BackupZombie::~BackupZombie(){
+
 }
 
 Plant::Plant(int tx, int ty, int ttype, int thp, int tattack, int tdefense, int tattackSpeed, std::string tname, int tcolor, int tneedSunNumber, int tcoolDownTime, int tbulletType, bool tisZombieValid):Charactor(tx, ty, ttype, thp, tattack, tdefense, tattackSpeed, tname, tcolor){

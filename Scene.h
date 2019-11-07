@@ -108,9 +108,10 @@ class GroundScene{
 		void genAZombie();
 };
 
-#define LEVEL_UP_TIME    600
-#define MAX_LEVEL        5
-#define MAX_GAP_TIME     100
+#define LEVEL_UP_TIME    3000
+#define MAX_LEVEL        10
+#define MAX_GAP_TIME     1000
+#define TIME_DESC        50
 
 class Scene{
 	private:

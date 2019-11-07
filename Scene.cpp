@@ -292,6 +292,13 @@ SceneSignal GroundScene::update(){
 		score = 0;
 	}
 	std::vector<Object*>::iterator ite = objects.begin()+sunVectorN;
+	for(int i = 0; i < GSBH; ++i){
+		for(int j = 0; j < GSBW; ++j){
+			if(plants[i][j] != NULL && plants[i][j]->getIsDead()){
+				plants[i][j] = NULL;
+			}
+		}
+	}
 	while(ite != objects.end()){
 		if((*ite)->getIsDead()){
 			ite = objects.erase(ite);
@@ -565,10 +572,10 @@ void GroundScene::randomGenZombie(){
 	if(level == 0){
 		return;
 	}
-	genZombieSpeed = MAX_GAP_TIME-(level-1)*10;
+	genZombieSpeed = MAX_GAP_TIME-(level-1)*TIME_DESC;
 	if(genZombieCount >= genZombieSpeed-1){
 		genZombieCount = 0;
-		genZombieNumber += level;
+		genZombieNumber += (level+1)/2;
 	}
 	else{
 		genZombieCount++;
@@ -611,10 +618,12 @@ void GroundScene::genAZombie(){
 Scene::Scene(int tx, int ty){
 	x = tx; y = ty; w = SW; h = SH;
 	state = STATE_NORMAL;
-	level = 0;
+	level = 1;
 	levelCount = 0;
 	ss = new StateScene(x, y);
 	gs = new GroundScene(x, y+SSH);
+	ss->setLevel(level);
+	gs->setLevel(level);
 }
 
 Scene::~Scene(){

@@ -32,6 +32,7 @@ using namespace std;
 #define OBJ_TYPE_POTATOMINE       103
 #define OBJ_TYPE_JALAPENO         113
 #define OBJ_TYPE_WALLNUT          123
+#define OBJ_TYPE_REPEATOR         133
 
 #define OBJ_TYPE_NORMALZOMBIE     14
 #define OBJ_TYPE_CONEZOMBIE       24
@@ -432,6 +433,20 @@ class WallNut:public Plant{
 	public:
 		WallNut(int tx, int ty);
 		~WallNut();
+};
+
+#define REPEATOR_HP              		125
+#define REPEATOR_ATTACK          		0
+#define REPEATOR_DEFENSE         		50
+#define REPEATOR_ATTACK_SPEED    		6
+#define REPEATOR_NEED_SUN_NUMBER 		1
+#define REPEATOR_COOLDOWN_TIME   		80
+
+class Repeator:public Plant{
+	private:
+	public:
+		Repeator(int tx, int ty);
+		~Repeator();
 };
 
 #define BULLET_EFF_NORMAL      0

@@ -667,6 +667,15 @@ WallNut::~WallNut(){
 
 }
 
+Repeator::Repeator(int tx, int ty):Plant(tx, ty, OBJ_TYPE_REPEATOR, REPEATOR_HP, REPEATOR_ATTACK, REPEATOR_DEFENSE, REPEATOR_ATTACK_SPEED, "Repeator", GREEN, REPEATOR_NEED_SUN_NUMBER, REPEATOR_COOLDOWN_TIME, OBJ_TYPE_PEABULLET, 1){
+
+}
+
+Repeator::~Repeator(){
+
+}
+
+
 Bullet::Bullet(int tx, int ty, int ttype, int tspeed, int tattack, int teffection, std::string tname, int tcolor):Object(tx, ty, ttype){
 	speed = tspeed;
 	attack = tattack;

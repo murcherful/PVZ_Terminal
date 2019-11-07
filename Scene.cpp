@@ -146,6 +146,8 @@ void StateScene::addPlant(){
 	plants.push_back(new WallNut(0, 0));
 	plants.push_back(new SnowPea(0, 0));
 	plants.push_back(new MelonPult(0, 0));
+	plants.push_back(new Repeator(0, 0));
+
 	plants.push_back(new SnowMelon(0, 0));
 	plants.push_back(new SpikeWeed(0, 0));
 	plants.push_back(new Garlic(0, 0));
@@ -190,8 +192,8 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new PeaShooter(x+1+3+1, y+1+2+BLOCKW)); */
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
-	objects.push_back(new BucketZombie(x+1+3+0*BLOCKW+1, y+1+2+1*BLOCKW));
-	weedKiller[1] = 0;
+	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
+	/* weedKiller[1] = 0; */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new NormalZombie(x+1+3+7*BLOCKW+1+2, y+1+2+1*BLOCKW)); */
@@ -441,7 +443,9 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		else if(type == OBJ_TYPE_WALLNUT){
 			plants[yIndex][xIndex] = new WallNut(tx, ty);
 		}
-
+		else if(type == OBJ_TYPE_REPEATOR){
+			plants[yIndex][xIndex] = new Repeator(tx, ty);
+		}
 		objects.push_back(plants[yIndex][xIndex]);
 	}
 }

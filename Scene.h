@@ -32,6 +32,8 @@ typedef struct SceneSignal{
 #define GS_SIGNAL_NULL         		10
 #define GS_SIGNAL_ADD_SUN      		11
 #define GS_SIGNAL_PLANT_VALID  		12
+#define GS_SIGNAL_ADD_SCORE         13
+#define GS_SIGNAL_OVER              14
 
 
 class StateScene{
@@ -77,6 +79,8 @@ class GroundScene{
 		int randSortCount;
 		bool isRandSort;
 		int specialColor[GSBH][GSBW];
+		int score;
+		bool weedKiller[GSBH];
 
 		GroundScene(int tx, int ty);
 		~GroundScene();
@@ -116,4 +120,5 @@ class Scene{
 		void groundSceneSelectUp();
 		void process();
 		void changeState();
+		void stopOrContinue();
 };

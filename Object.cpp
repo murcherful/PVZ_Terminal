@@ -188,8 +188,8 @@ void Zombie::draw(){
 }
 
 void Zombie::interactive(Plant* p){
-	isInteractive = 1;
 	if(p->getIsZombieValid() && getY() == p->getY() && (p->getX()+p->getW()+ATTACK_MAX_DIS >= getX() && p->getX() <= getX())){
+		isInteractive = 1;
 		if(!getIsAttackStart()){
 			startAttack();
 		}
@@ -219,6 +219,20 @@ void Zombie::randomUpDonw(){
 			y-=BLOCKW;
 		}
 	}
+}
+
+ObjectSignal Zombie::getSignal(){
+	ObjectSignal signal(OBJ_SIGNAL_NULL, 0);
+	if(isDead){
+		signal.type = OBJ_SIGNAL_ADD_SCORE;
+		signal.data = 1000;
+	}
+	else if(x <= 3){
+		signal.type = OBJ_SIGNAL_GET_LINE;
+		signal.x = x;
+		signal.y = y;
+	}
+	return signal;
 }
 
 NormalZombie::NormalZombie(int tx, int ty):Zombie(tx, ty, OBJ_TYPE_NORMALZOMBIE, NORMALZOMBIE_HP, NORMALZOMBIE_ATTACK, NORMALZOMBIE_DEFENSE, NORMALZOMBIE_ATTACK_SPEED, "NormalZ", BLACK, NORMALZOMBIE_SPEED){
@@ -643,6 +657,14 @@ ObjectSignal Jalapeno::getSignal(){
 		singal.y = y;
 	}
 	return singal;
+}
+
+WallNut::WallNut(int tx, int ty):Plant(tx, ty, OBJ_TYPE_WALLNUT, WALLNUT_HP, WALLNUT_ATTACK, WALLNUT_DEFENSE, WALLNUT_ATTACK_SPEED, "WallNut", BROWN, WALLNUT_NEED_SUN_NUMBER, WALLNUT_COOLDOWN_TIME, -1, 1){
+
+}
+
+WallNut::~WallNut(){
+
 }
 
 Bullet::Bullet(int tx, int ty, int ttype, int tspeed, int tattack, int teffection, std::string tname, int tcolor):Object(tx, ty, ttype){

@@ -128,6 +128,12 @@ void StateScene::processSignal(SceneSignal& signal){
 			sunsNumber -= infos[tIdx].needSunNumber;
 		}
 	}
+	else if(signal.type == GS_SIGNAL_ADD_SCORE){
+		score += signal.data;
+	}
+	else if(signal.type == GS_SIGNAL_OVER){
+		state = STATE_OVER;
+	}
 }
 
 void StateScene::setState(int state){
@@ -137,6 +143,7 @@ void StateScene::setState(int state){
 void StateScene::addPlant(){
 	plants.push_back(new SunFlower(0, 0));
 	plants.push_back(new PeaShooter(0, 0));
+	plants.push_back(new WallNut(0, 0));
 	plants.push_back(new SnowPea(0, 0));
 	plants.push_back(new MelonPult(0, 0));
 	plants.push_back(new SnowMelon(0, 0));
@@ -169,7 +176,9 @@ GroundScene::GroundScene(int tx, int ty){
 	sunVectorN = GSBH*GSBW;
 	randSortCount = 0;
 	isRandSort = 0;
+	score = 0;
 	for(int i = 0; i < GSBH; ++i){
+		weedKiller[i] = 1;
 		for(int j = 0; j < GSBW; ++j){
 			plants[i][j] = NULL;
 			specialColor[i][j] = WHITE;
@@ -181,14 +190,15 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new PeaShooter(x+1+3+1, y+1+2+BLOCKW)); */
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
-	objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+1*BLOCKW));
-	objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW));
-	objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW));
-	objects.push_back(new NormalZombie(x+1+3+7*BLOCKW+1+2, y+1+2+1*BLOCKW));
-	objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+0*BLOCKW));
-	objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+2*BLOCKW));
-	objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW));
-	objects.push_back(new NormalZombie(x+1+3+8*BLOCKW+1+2, y+1+2+1*BLOCKW));
+	objects.push_back(new BucketZombie(x+1+3+0*BLOCKW+1, y+1+2+1*BLOCKW));
+	weedKiller[1] = 0;
+	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW)); */
+	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW)); */
+	/* objects.push_back(new NormalZombie(x+1+3+7*BLOCKW+1+2, y+1+2+1*BLOCKW)); */
+	/* objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+0*BLOCKW)); */
+	/* objects.push_back(new NormalZombie(x+1+3+6*BLOCKW+1+2, y+1+2+2*BLOCKW)); */
+	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW)); */
+	/* objects.push_back(new NormalZombie(x+1+3+8*BLOCKW+1+2, y+1+2+1*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+7*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+8*BLOCKW+1, y+1+2+2*BLOCKW)); */
 	/* genPlant(4, 1, OBJ_TYPE_POTATOMINE); */
@@ -221,6 +231,9 @@ void GroundScene::draw(){
 	drawRect(x, y, w, h, DARKGREEN);
 	drawLine(x+1+3-1, y+1, h-2, 0, LIGHTYELLOW);
 	for(int i = 0; i < GSBH; ++i){
+		if(weedKiller[i]){
+			drawLine(x+1+1, y+1+2+i*BLOCKW, 3, 0, GRAY);
+		}
 		for(int j = 0; j < GSBW; ++j){
 			if(specialColor[i][j] != WHITE){
 				drawWholeRect(x+1+3+j*BLOCKW, y+1+i*BLOCKW, BLOCKW, BLOCKW, specialColor[i][j]);
@@ -228,14 +241,23 @@ void GroundScene::draw(){
 			}
 		}
 	}
+	int selectBoxColor = BLACK;
 	if(state == STATE_NORMAL){
-		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, GRAY);
+		selectBoxColor = GRAY;
 	}
 	else if(state == STATE_PLANT){
-		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, DARKGREEN);
+		selectBoxColor = GREEN;
 	}
 	else if(state == STATE_REMOVE){
-		drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, RED);
+		selectBoxColor = RED;
+	}
+	drawRect(x+1+3+selectX*BLOCKW, y+1+selectY*BLOCKW, BLOCKW, BLOCKW, selectBoxColor);
+	if(isRandSort){
+		randSortCount = 10;
+		isRandSort = 0;
+	}
+	else if(randSortCount != 0){
+		randSortCount--;
 	}
 	for(int i = 0; i < objects.size(); ++i){
 		if(randSortCount == 0 && i >= sunVectorN){
@@ -249,6 +271,11 @@ void GroundScene::draw(){
 
 SceneSignal GroundScene::update(){
 	SceneSignal signal(GS_SIGNAL_NULL, 0);
+	if(score != 0){
+		signal.type = GS_SIGNAL_ADD_SCORE;
+		signal.data = score;
+		score = 0;
+	}
 	std::vector<Object*>::iterator ite = objects.begin()+sunVectorN;
 	while(ite != objects.end()){
 		if((*ite)->getIsDead()){
@@ -298,14 +325,12 @@ SceneSignal GroundScene::update(){
 		objects[i]->update();
 		ObjectSignal os = objects[i]->getSignal();
 		processObjSignal(os);
+		if(state == STATE_OVER){
+			signal.type = GS_SIGNAL_OVER; 
+			return signal;
+		}
 	}
-	if(isRandSort){
-		randSortCount = 10;
-		isRandSort = 0;
-	}
-	else if(randSortCount != 0){
-		randSortCount--;
-	}
+
 
 	std::stringstream debugString;
 	debugString << "n: " << objects.size();
@@ -413,6 +438,10 @@ void GroundScene::genPlant(int xIndex, int yIndex, int type){
 		else if(type == OBJ_TYPE_JALAPENO){
 			plants[yIndex][xIndex] = new Jalapeno(tx, ty);
 		}
+		else if(type == OBJ_TYPE_WALLNUT){
+			plants[yIndex][xIndex] = new WallNut(tx, ty);
+		}
+
 		objects.push_back(plants[yIndex][xIndex]);
 	}
 }
@@ -467,6 +496,27 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 			specialColor[ty][i] = signal.data;
 		}	
 	}
+	else if(signal.type == OBJ_SIGNAL_ADD_SCORE){
+		score += signal.data;
+	}
+	else if(signal.type == OBJ_SIGNAL_GET_LINE){	
+		int ty = (signal.y-1-y)/BLOCKW;
+		if(weedKiller[ty]){
+			weedKiller[ty] = 0;
+			for(int i = sunVectorN; i < objects.size(); ++i){
+				if(objects[i]->type%10 == OBJ_TYPE_ZOMBIE){
+					objects[i]->die();
+					score += 1000;
+				}
+			}
+			for(int i = 0; i < GSBW; ++i){
+				specialColor[ty][i] = BLACK;
+			}
+		}
+		else{
+			state = STATE_OVER;
+		}
+	}
 }
 
 void GroundScene::setState(int state){
@@ -492,37 +542,64 @@ void Scene::draw(){
 }
 
 void Scene::update(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	SceneSignal sss = ss->update();
 	SceneSignal gss = gs->update();
+	if(gss.type == GS_SIGNAL_OVER){
+		state = STATE_OVER;
+	}
 	ss->processSignal(gss);
 	gs->processSignal(sss);
 }
 
 void Scene::stateSceneSelectLeft(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	ss->selectLeft();
 }
 
 void Scene::stateSceneSelectRight(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	ss->selectRight();
 }
 
 void Scene::groundSceneSelectLeft(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	gs->selectLeft();
 }
 
 void Scene::groundSceneSelectRight(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	gs->selectRight();
 }
 
 void Scene::groundSceneSelectDown(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	gs->selectDown();
 }
 
 void Scene::groundSceneSelectUp(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	gs->selectUp();
 }
 
 void Scene::process(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	SceneSignal sss = ss->process(state);
 	SceneSignal gss = gs->process(state);
 	ss->processSignal(gss);
@@ -530,7 +607,22 @@ void Scene::process(){
 }
 
 void Scene::changeState(){
+	if(state == STATE_OVER || state == STATE_PAUSE){
+		return;
+	}
 	state = (state+1)%STATE_NUMBER;
 	ss->setState(state);
 	gs->setState(state);
+}
+
+void Scene::stopOrContinue(){
+	if(state == STATE_PAUSE){
+		state = STATE_NORMAL;
+	}	
+	else if(state != STATE_OVER){
+		state = STATE_PAUSE;
+	}
+	ss->setState(state);
+	gs->setState(state);
+
 }

@@ -31,6 +31,7 @@ using namespace std;
 #define OBJ_TYPE_SQUASH           93
 #define OBJ_TYPE_POTATOMINE       103
 #define OBJ_TYPE_JALAPENO         113
+#define OBJ_TYPE_WALLNUT          123
 
 #define OBJ_TYPE_NORMALZOMBIE     14
 #define OBJ_TYPE_CONEZOMBIE       24
@@ -59,6 +60,8 @@ typedef struct ObjectSignal{
 #define OBJ_SIGNAL_SINGAL_COLOR   3
 #define OBJ_SIGNAL_CROSS_COLOR    4
 #define OBJ_SIGNAL_LINE_COLOR     5
+#define OBJ_SIGNAL_ADD_SCORE      6
+#define OBJ_SIGNAL_GET_LINE       7
 
 class Object{
 	private:
@@ -138,6 +141,7 @@ class Zombie:public Charactor{
 		virtual void interactive(Plant* p);
 		virtual void slowDown();
 		virtual void randomUpDonw();
+		ObjectSignal getSignal();
 };
 
 #define NORMALZOMBIE_HP             180
@@ -414,6 +418,20 @@ class Jalapeno:public Plant{
 		void draw();
 		void interactive(Zombie* z);
 		ObjectSignal getSignal();
+};
+
+#define WALLNUT_HP              		400
+#define WALLNUT_ATTACK          		0
+#define WALLNUT_DEFENSE         		150
+#define WALLNUT_ATTACK_SPEED    		1000
+#define WALLNUT_NEED_SUN_NUMBER 		1
+#define WALLNUT_COOLDOWN_TIME   		80
+
+class WallNut:public Plant{
+	private:
+	public:
+		WallNut(int tx, int ty);
+		~WallNut();
 };
 
 #define BULLET_EFF_NORMAL      0

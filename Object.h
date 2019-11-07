@@ -43,6 +43,8 @@ using namespace std;
 #define OBJ_TYPE_DANCINGZOMBIE    74
 #define OBJ_TYPE_BACKUPZOMBIE     84
 
+#define OBJ_ZOMBIE_NUMBER         8
+
 #define OBJ_TYPE_PEABULLET        15
 #define OBJ_TYPE_SNOWBULLET       25
 #define OBJ_TYPE_MELONBULLET      35
@@ -295,7 +297,7 @@ class Plant:public Charactor{
 		ObjectSignal getSignal();
 };
 
-#define SUNFLOWER_GEN_SUN_SPEED   70
+#define SUNFLOWER_GEN_SUN_SPEED   80
 #define SUNFLOWER_HP              150
 #define SUNFLOWER_ATTACK          0
 #define SUNFLOWER_DEFENSE         70
@@ -470,7 +472,7 @@ class PotatoMine:public Plant{
 #define JALAPENO_ATTACK          		-1
 #define JALAPENO_DEFENSE         		50
 #define JALAPENO_ATTACK_SPEED    		250
-#define JALAPENO_NEED_SUN_NUMBER 		1
+#define JALAPENO_NEED_SUN_NUMBER 		10
 #define JALAPENO_COOLDOWN_TIME   		120
 #define JALAPENO_READY_COUNT          	10
 
@@ -493,7 +495,7 @@ class Jalapeno:public Plant{
 #define WALLNUT_ATTACK          		0
 #define WALLNUT_DEFENSE         		150
 #define WALLNUT_ATTACK_SPEED    		1000
-#define WALLNUT_NEED_SUN_NUMBER 		1
+#define WALLNUT_NEED_SUN_NUMBER 		8
 #define WALLNUT_COOLDOWN_TIME   		80
 
 class WallNut:public Plant{
@@ -507,8 +509,8 @@ class WallNut:public Plant{
 #define REPEATOR_ATTACK          		0
 #define REPEATOR_DEFENSE         		50
 #define REPEATOR_ATTACK_SPEED    		7
-#define REPEATOR_NEED_SUN_NUMBER 		1
-#define REPEATOR_COOLDOWN_TIME   		80
+#define REPEATOR_NEED_SUN_NUMBER 		14
+#define REPEATOR_COOLDOWN_TIME   		150
 
 class Repeator:public Plant{
 	private:

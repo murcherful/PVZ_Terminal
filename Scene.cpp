@@ -6,7 +6,7 @@ StateScene::StateScene(int tx, int ty){
 	selectIndex = 0;
 	state = STATE_NORMAL;
 	score = 0;
-	sunsNumber = 99999;
+	sunsNumber = 8;
 	blockNumber = (w-2)/BLOCKW;
 	plantsNumber = blockNumber-1;
 	stateW = w-2-plantsNumber*BLOCKW;
@@ -50,6 +50,10 @@ void StateScene::draw(){
 	std::stringstream scoreString;
 	scoreString << "SCORE: " << score;
 	drawText(x+2, y+3, scoreString.str(), BLUE, WHITE);
+	std::stringstream levelString;
+	levelString << "LEVEL: " << level;
+	drawText(x+2, y+4, levelString.str(), BLACK, WHITE);
+
 
 
 	drawLine(x+1, y+1, h-2, 0, LIGHTYELLOW);	
@@ -163,6 +167,9 @@ void StateScene::addPlant(){
 	}
 }
 
+void StateScene::setLevel(int level){
+	this->level = level;
+}
 
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -181,6 +188,9 @@ GroundScene::GroundScene(int tx, int ty){
 	isRandSort = 0;
 	score = 0;
 	level = 0;
+	genZombieCount = 0;
+	genZombieSpeed = 0;
+	genZombieNumber = 0;
 	for(int i = 0; i < GSBH; ++i){
 		weedKiller[i] = 1;
 		for(int j = 0; j < GSBW; ++j){
@@ -195,7 +205,7 @@ GroundScene::GroundScene(int tx, int ty){
 	/* objects.push_back(new NewsZombie(x+1+3+7*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new NewsZombie(x+1+3+8*BLOCKW+1, y+1+2)); */
 	/* objects.push_back(new DoorZombie(x+1+3+8*BLOCKW+1, y+1+2+1*BLOCKW)); */
-	objects.push_back(new DancingZombie(x+1+3+8*BLOCKW+1, y+1+2+0*BLOCKW));
+	/* objects.push_back(new DancingZombie(x+1+3+8*BLOCKW+1, y+1+2+0*BLOCKW)); */
 	/* weedKiller[1] = 0; */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+0*BLOCKW)); */
 	/* objects.push_back(new BucketZombie(x+1+3+6*BLOCKW+1, y+1+2+2*BLOCKW)); */
@@ -335,6 +345,7 @@ SceneSignal GroundScene::update(){
 			return signal;
 		}
 	}
+	randomGenZombie();
 
 
 	std::stringstream debugString;
@@ -546,10 +557,62 @@ void GroundScene::setState(int state){
 	this->state = state;
 }
 
+void GroundScene::setLevel(int level){
+	this->level = level;
+}
+
+void GroundScene::randomGenZombie(){
+	if(level == 0){
+		return;
+	}
+	genZombieSpeed = MAX_GAP_TIME-(level-1)*10;
+	if(genZombieCount >= genZombieSpeed-1){
+		genZombieCount = 0;
+		genZombieNumber += level;
+	}
+	else{
+		genZombieCount++;
+	}
+	if(genZombieNumber > 0){
+		genZombieNumber--;
+		genAZombie();
+	}
+}
+
+void GroundScene::genAZombie(){
+	int ty = rand()%GSBH;
+	int type = (rand()%OBJ_ZOMBIE_NUMBER+1)*10+OBJ_TYPE_ZOMBIE;
+	if(type == OBJ_TYPE_NORMALZOMBIE){
+		objects.push_back(new NormalZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_CONEZOMBIE){
+		objects.push_back(new ConeZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_BUCKETZOMBIE){
+		objects.push_back(new BucketZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_NEWSZOMBIE){
+		objects.push_back(new NewsZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_DOORZOMBIE){
+		objects.push_back(new DoorZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_POLEZOMBIE){
+		objects.push_back(new PoleZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_DANCINGZOMBIE){
+		objects.push_back(new DancingZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+	else if(type == OBJ_TYPE_BACKUPZOMBIE){
+		objects.push_back(new BackupZombie(x+1+3+(GSBW-1)*BLOCKW+1, y+1+ty*BLOCKW+2));
+	}
+}
+
 Scene::Scene(int tx, int ty){
 	x = tx; y = ty; w = SW; h = SH;
 	state = STATE_NORMAL;
 	level = 0;
+	levelCount = 0;
 	ss = new StateScene(x, y);
 	gs = new GroundScene(x, y+SSH);
 }
@@ -568,6 +631,15 @@ void Scene::draw(){
 void Scene::update(){
 	if(state == STATE_OVER || state == STATE_PAUSE){
 		return;
+	}
+	if(levelCount >= LEVEL_UP_TIME-1){
+		levelCount = 0;
+		level++;
+		ss->setLevel(level);
+		gs->setLevel(level);
+	}
+	else if(level < MAX_LEVEL){
+		levelCount++;
 	}
 	SceneSignal sss = ss->update();
 	SceneSignal gss = gs->update();

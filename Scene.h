@@ -63,6 +63,7 @@ class StateScene{
 		void processSignal(SceneSignal& signal);
 		void setState(int state);
 		void addPlant();
+		void setLevel(int level);
 };
 
 class GroundScene{
@@ -83,6 +84,9 @@ class GroundScene{
 		int score;
 		bool weedKiller[GSBH];
 		int level;
+		int genZombieCount;
+		int genZombieSpeed;
+		int genZombieNumber;
 
 		GroundScene(int tx, int ty);
 		~GroundScene();
@@ -99,7 +103,14 @@ class GroundScene{
 		void processObjSignal(ObjectSignal& signal);
 		void genPlant(int x, int y, int type);
 		void setState(int state);
+		void randomGenZombie();
+		void setLevel(int level);
+		void genAZombie();
 };
+
+#define LEVEL_UP_TIME    600
+#define MAX_LEVEL        5
+#define MAX_GAP_TIME     100
 
 class Scene{
 	private:
@@ -110,6 +121,7 @@ class Scene{
 		GroundScene* gs;
 		int state;
 		int level;
+		int levelCount;
 
 		Scene(int tx, int ty);
 		~Scene();

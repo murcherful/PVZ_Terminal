@@ -36,6 +36,8 @@ typedef struct SceneSignal{
 #define GS_SIGNAL_OVER              14
 
 
+#define START_SUN_NUMBER            999999
+
 class StateScene{
 	private:
 		
@@ -108,10 +110,10 @@ class GroundScene{
 		void genAZombie();
 };
 
-#define LEVEL_UP_TIME    3000
+#define LEVEL_UP_TIME    100
 #define MAX_LEVEL        10
-#define MAX_GAP_TIME     1000
-#define TIME_DESC        50
+#define MAX_GAP_TIME     100
+#define TIME_DESC        0
 
 class Scene{
 	private:
@@ -137,5 +139,5 @@ class Scene{
 		void process();
 		void changeState();
 		void stopOrContinue();
-		bool isStop();
+		bool isStopOrOver();
 };

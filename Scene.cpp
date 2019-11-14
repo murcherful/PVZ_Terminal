@@ -6,7 +6,7 @@ StateScene::StateScene(int tx, int ty){
 	selectIndex = 0;
 	state = STATE_NORMAL;
 	score = 0;
-	sunsNumber = 8;
+	sunsNumber = START_SUN_NUMBER;
 	blockNumber = (w-2)/BLOCKW;
 	plantsNumber = blockNumber-1;
 	stateW = w-2-plantsNumber*BLOCKW;
@@ -530,8 +530,11 @@ void GroundScene::processObjSignal(ObjectSignal& signal){
 			weedKiller[ty] = 0;
 			for(int i = sunVectorN; i < objects.size(); ++i){
 				if(objects[i]->type%10 == OBJ_TYPE_ZOMBIE){
-					objects[i]->die();
-					score += 1000;
+					int oy = (objects[i]->y-1-y)/BLOCKW;
+					if(ty == oy){
+						objects[i]->die();
+						score += 1000;
+					}
 				}
 			}
 			for(int i = 0; i < GSBW; ++i){
@@ -732,8 +735,8 @@ void Scene::stopOrContinue(){
 
 }
 
-bool Scene::isStop(){
-	if(state == STATE_PAUSE){
+bool Scene::isStopOrOver(){
+	if(state == STATE_PAUSE || state == STATE_OVER){
 		return 1;
 	}
 	else{

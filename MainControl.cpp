@@ -51,7 +51,7 @@ void MainControl::start(){
 			else if(key == 'p'){
 				scene.stopOrContinue();
 			}
-			else if(scene.isStop() && key == 27){
+			else if(scene.isStopOrOver() && key == 27){
 				break;
 			}
 			else if(key == 10){

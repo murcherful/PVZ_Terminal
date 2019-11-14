@@ -731,3 +731,12 @@ void Scene::stopOrContinue(){
 	gs->setState(state);
 
 }
+
+bool Scene::isStop(){
+	if(state == STATE_PAUSE){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}

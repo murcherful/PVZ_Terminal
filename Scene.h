@@ -137,4 +137,5 @@ class Scene{
 		void process();
 		void changeState();
 		void stopOrContinue();
+		bool isStop();
 };

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>高程课设二报告</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# **高程课设二报告**
+
+##### 植物大战僵尸控制台版
+
+### 马常风 
+
+171860637
+
+njumcf@126.com，171860637@smail.nju.edu.cn 
+
+---
+
+# 开源
+
+ - [项目地址](https://github.com/murcherful/PVZ_Terminal)
+
+---
+
+# 游戏截图
+
+ - [查看游戏截图](设计报告二.pdf#page=2)
+
+---
+
+# 游戏简介
+
+ - 本游戏为控制台版的植物大战僵尸，无尽模式，玩家需要通过种植不同植物来抵挡僵尸，分数由抵挡时间和击杀僵尸数决定。
+
+ - 项目在Ubuntu16.04、CMAKE3.5.1、g++5.4.0环境下开发。 包含`CMakeList.txt`。但由于使用了 Linux系统特有的函数和库，因此不支持在Windows或其他系统下编译。编译成功后，生成可执行文件`Game`。
+
+ 
+---
+
+# 操作方法
+
+ - [查看操作方法](设计报告二.pdf#page=2)
+
+---
+
+# 试玩
+
+ - Ubuntu 18.04 虚拟机
+
+---
+
+# 设计思路
+
+ - [查看设计思路](设计报告二.pdf#page=3)
+
+---
+
+# 类的设计
+
+ - [查看总体类的关系](设计报告二.pdf#page=4)
+ 
+ - [查看物体类的关系](设计报告二.pdf#page=5)
+
+---
+
+# 设计细节
+
+ - [查看设计细节](设计报告二.pdf#page=5)
+ - 信号机制
+	- 查看代码`Scene.h:22`
+	- 查看代码`Object.h:54`
+
+---
+
+# tricky实现
+
+ - [查看tricky实现](设计报告二.pdf#page=7)
+ - 移动商店
+	- 游戏展示
+ - 统一管理
+	- 查看代码`Scene.cpp:317`
+ - 信号机制
+ - 确定类型
+	- 查看代码`Object.h:16`
+ - 遮挡处理
+	- 游戏展示
+ - 溅射伤害
+	- 游戏展示
+	
+---
+	
+# 一些建议
+ - git大法好
+	- 展示git
+ 
+---
+
+# Thanks 
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

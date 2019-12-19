@@ -23,3 +23,4 @@ This is a game for AP(Advanced Programming) Project2.
   ```
 - 植物和僵尸的特性基本同原植物大战僵尸。操作上，游戏分为三种状态`NORMAL`、`PLANT`、`REMOVE`，通过`f`切换。`NORMAL`状态用于收集太阳，`PALNT`状态用于种植植物，`REMOVE`状态用于移除植物。`w`、`a`、`s`、`d`移动选择框进行选择种植或收集的区域。`Enter`种植、收集或移除。通过`q`、`w`选择种植的植物。`p`暂停，再按继续。暂停状态下，`ESC`退出。
 
+- 展示的sildes在Slides文件夹中，下载打开html即可。

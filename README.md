@@ -1,5 +1,5 @@
 # PVZ_Terminal
-This is a game for AP(Adanced Program) Project2.
+This is a game for AP(Advanced Programming) Project2.
 
 # 游戏简介
 
